@@ -89,18 +89,48 @@ prenticeTest<-function(df,type){
         mainCrit<-c("APPR","UNDR","CLAR","IBAL","ANTO","ORTH","NCON")
         derCrit<-c("APPR","UNDR","CLAR","IBAL","CONN")
         
-        data<-data.frame(CRITERION=character(),pvalue=numeric(),effect=numeric())
+        data<-data.frame(CRITERION=character(),pvalue=numeric())
         
         if(type=="main"){
                 for(crit in mainCrit){
                         pt<-prentice.test(df[,crit],as.factor(df$COUNTRY),as.factor(df$CANDIDATE))
-                        data<-rbind(data,c(CRITERION=crit,pvalue=pt$p.value,effect=pt$effect))
+                        data<-rbind(data,c(CRITERION=crit,pvalue=pt$p.value))
                 }}
         if(type=="derived"){
                 for(crit in derCrit){
                         pt<-prentice.test(df[,crit],as.factor(df$COUNTRY),as.factor(df$CANDIDATE))
-                        data<-rbind(data,c(CRITERION=crit,pvalue=pt$p.value,effect=pt$effect))
+                        data<-rbind(data,c(CRITERION=crit,pvalue=pt$p.value))
                 }}
         
-        return(data %>% setNames(c("CRITERION","pvalue","effect")))
+        return(data %>% setNames(c("CRITERION","pvalue")))
+}
+
+#Mann-Whitney-Wilcoxon Test
+mwwTest <- function(df,criterion,PAQ){
+        #df is the data
+        #criterion is a vector of criterion for which MWWT is conducted
+        #PAQ attribute under test
+        
+        #initialise dataframe
+        wt<-data.frame(PAQ=character(),
+                       CRITERION=character(),
+                       CANDIDATE=character(),
+                       pvalue=numeric(),
+                       adjpval=numeric())
+        
+        for (c in criterion){
+                for (cand in unique(df$CANDIDATE)){
+                        data<-df %>% filter(CANDIDATE==cand) %>% 
+                                mutate(COUNTRY=as.factor(COUNTRY))
+                        wt_cand<-wilcox.test(as.formula(data[,c] ~ data$COUNTRY))
+                        wt<-rbind(wt,data.frame(PAQ=PAQ,
+                                                CRITERION=c,
+                                                CANDIDATE=cand,
+                                                pvalue=wt_cand$p.value,
+                                                adjval=p.adjust(wt_cand$p.value,
+                                                                method = "bonferroni",
+                                                                n=2)))
+                }
+        }
+        return(wt %>% setNames(c("PAQ","CRITERION","CANDIDATE","pvalue","adjval")))
 }

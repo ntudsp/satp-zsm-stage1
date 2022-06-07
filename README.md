@@ -21,24 +21,28 @@ en\_US.UTF-8\|\|en\_US.UTF-8\|\|en\_US.UTF-8\|\|C\|\|en\_US.UTF-8\|\|en\_US.UTF-
 **attached base packages:** *stats*, *graphics*, *grDevices*, *utils*,
 *datasets*, *methods* and *base*
 
-**other attached packages:** *tidyr(v.1.1.4)*, *kableExtra(v.1.3.4)*,
-*stringr(v.1.4.0)*, *dplyr(v.1.0.7)*, *dataverse(v.0.3.10)* and
-*pander(v.0.6.5)*
+**other attached packages:** *muStat(v.1.7.0)*, *rstatix(v.0.7.0)*,
+*tidyr(v.1.1.4)*, *kableExtra(v.1.3.4)*, *stringr(v.1.4.0)*,
+*dplyr(v.1.0.7)*, *dataverse(v.0.3.10)* and *pander(v.0.6.5)*
 
-**loaded via a namespace (and not attached):** *Rcpp(v.1.0.7)*,
-*pillar(v.1.6.4)*, *compiler(v.4.1.1)*, *tools(v.4.1.1)*,
-*digest(v.0.6.28)*, *viridisLite(v.0.4.0)*, *evaluate(v.0.14)*,
-*lifecycle(v.1.0.1)*, *tibble(v.3.1.5)*, *pkgconfig(v.2.0.3)*,
-*rlang(v.0.4.12)*, *DBI(v.1.1.1)*, *rstudioapi(v.0.13)*,
-*yaml(v.2.2.1)*, *xfun(v.0.25)*, *httr(v.1.4.2)*, *knitr(v.1.33)*,
-*xml2(v.1.3.2)*, *generics(v.0.1.1)*, *vctrs(v.0.3.8)*,
-*systemfonts(v.1.0.2)*, *webshot(v.0.5.2)*, *tidyselect(v.1.1.1)*,
-*svglite(v.2.0.0)*, *glue(v.1.4.2)*, *R6(v.2.5.1)*, *fansi(v.0.5.0)*,
-*rmarkdown(v.2.10)*, *purrr(v.0.3.4)*, *magrittr(v.2.0.1)*,
-*scales(v.1.1.1)*, *ellipsis(v.0.3.2)*, *htmltools(v.0.5.1.1)*,
-*assertthat(v.0.2.1)*, *rvest(v.1.0.1)*, *colorspace(v.2.0-2)*,
-*utf8(v.1.2.2)*, *stringi(v.1.7.5)*, *munsell(v.0.5.0)* and
-*crayon(v.1.4.2)*
+**loaded via a namespace (and not attached):** *tidyselect(v.1.1.1)*,
+*xfun(v.0.25)*, *purrr(v.0.3.4)*, *haven(v.2.4.3)*, *carData(v.3.0-4)*,
+*colorspace(v.2.0-2)*, *vctrs(v.0.3.8)*, *generics(v.0.1.1)*,
+*htmltools(v.0.5.1.1)*, *viridisLite(v.0.4.0)*, *yaml(v.2.2.1)*,
+*utf8(v.1.2.2)*, *rlang(v.0.4.12)*, *pillar(v.1.6.4)*,
+*foreign(v.0.8-81)*, *glue(v.1.4.2)*, *DBI(v.1.1.1)*, *readxl(v.1.3.1)*,
+*lifecycle(v.1.0.1)*, *cellranger(v.1.1.0)*, *munsell(v.0.5.0)*,
+*rvest(v.1.0.1)*, *zip(v.2.2.0)*, *evaluate(v.0.14)*, *knitr(v.1.33)*,
+*rio(v.0.5.27)*, *forcats(v.0.5.1)*, *curl(v.4.3.2)*, *fansi(v.0.5.0)*,
+*broom(v.0.7.9)*, *Rcpp(v.1.0.7)*, *scales(v.1.1.1)*,
+*backports(v.1.2.1)*, *webshot(v.0.5.2)*, *abind(v.1.4-5)*,
+*systemfonts(v.1.0.2)*, *hms(v.1.1.0)*, *digest(v.0.6.28)*,
+*stringi(v.1.7.5)*, *openxlsx(v.4.2.4)*, *tools(v.4.1.1)*,
+*magrittr(v.2.0.1)*, *tibble(v.3.1.5)*, *crayon(v.1.4.2)*,
+*car(v.3.0-11)*, *pkgconfig(v.2.0.3)*, *ellipsis(v.0.3.2)*,
+*data.table(v.1.14.2)*, *xml2(v.1.3.2)*, *assertthat(v.0.2.1)*,
+*rmarkdown(v.2.10)*, *svglite(v.2.0.0)*, *httr(v.1.4.2)*,
+*rstudioapi(v.0.13)*, *R6(v.2.5.1)* and *compiler(v.4.1.1)*
 
 ## Data preparation
 
@@ -2249,7 +2253,1131 @@ rancak
 
 ## Statistical analysis
 
+### One translation candidate
+
 Due to differences in sample size, Kruskal-Wallis test was adopted to
 examine the statistical differences between SG and MY populations for
 PAQ attributes with only a single translation candidate,
 i.e. *eventful*, *uneventful*, and *pleasant*.
+
+``` r
+#KWT for solo translation candidates
+kwtSolo<-rbind(kwTest(eventformdf,type = "main") %>% mutate(PAQ="eventful"),
+               kwTest(uneventformdf,type = "main") %>% mutate(PAQ="uneventful"),
+               kwTest(pleasformdf,type = "main") %>% mutate(PAQ="pleasant"))
+
+#Display KWT results
+kwtSolo %>%
+        group_by(PAQ,CRITERION) %>%
+        mutate(pvalue=as.numeric(pvalue),
+               effect=as.numeric(effect)) %>%
+        kbl(caption = "Kruskal-Wallis p-value and effect sizes for eventful, uneventful, and pleasant",
+            digits = 3, booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+```
+
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Kruskal-Wallis p-value and effect sizes for eventful, uneventful, and
+pleasant
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+CRITERION
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+<th style="text-align:right;">
+effect
+</th>
+<th style="text-align:left;">
+PAQ
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.588
+</td>
+<td style="text-align:right;">
+-0.012
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.041
+</td>
+<td style="text-align:right;">
+0.052
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.092
+</td>
+<td style="text-align:right;">
+0.030
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.288
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ANTO
+</td>
+<td style="text-align:right;">
+0.383
+</td>
+<td style="text-align:right;">
+-0.004
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ORTH
+</td>
+<td style="text-align:right;">
+0.196
+</td>
+<td style="text-align:right;">
+0.011
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NCON
+</td>
+<td style="text-align:right;">
+0.065
+</td>
+<td style="text-align:right;">
+0.039
+</td>
+<td style="text-align:left;">
+eventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.409
+</td>
+<td style="text-align:right;">
+-0.005
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.116
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.157
+</td>
+<td style="text-align:right;">
+0.016
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.956
+</td>
+<td style="text-align:right;">
+-0.016
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ANTO
+</td>
+<td style="text-align:right;">
+0.702
+</td>
+<td style="text-align:right;">
+-0.014
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ORTH
+</td>
+<td style="text-align:right;">
+0.691
+</td>
+<td style="text-align:right;">
+-0.014
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NCON
+</td>
+<td style="text-align:right;">
+0.499
+</td>
+<td style="text-align:right;">
+-0.009
+</td>
+<td style="text-align:left;">
+uneventful
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.352
+</td>
+<td style="text-align:right;">
+-0.002
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.822
+</td>
+<td style="text-align:right;">
+-0.016
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.178
+</td>
+<td style="text-align:right;">
+0.013
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.089
+</td>
+<td style="text-align:right;">
+0.031
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ANTO
+</td>
+<td style="text-align:right;">
+0.656
+</td>
+<td style="text-align:right;">
+-0.013
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ORTH
+</td>
+<td style="text-align:right;">
+0.581
+</td>
+<td style="text-align:right;">
+-0.011
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NCON
+</td>
+<td style="text-align:right;">
+0.051
+</td>
+<td style="text-align:right;">
+0.046
+</td>
+<td style="text-align:left;">
+pleasant
+</td>
+</tr>
+</tbody>
+</table>
+
+### Mulitple translation candidate
+
+With multiple translation candidates, the data takes the form of a
+replicated, unbalanced completed block design. The Prentice test (PT), a
+generalised form of the Friedman test was adopted to evaluate the
+differences between the candidates (blocks) as well as the influence of
+country of residence (groups).
+
+For differences detected at 5% significance level, a post-hoc
+Mann-Whitney-Wilcoxon rank sum test (MWWT) with Bonferroni correction
+was conducted for relevant pairs.
+
+``` r
+#generate p-values and effect size with prentice test
+pt<-rbind(cbind(PAQ="annoying",prenticeTest(annoyformdf,type="main")),
+          cbind(PAQ="vibrant",prenticeTest(vibrantformdf,"derived")),
+          cbind(PAQ="calm",prenticeTest(calmformdf,"derived")),
+          cbind(PAQ="monotonous",prenticeTest(monotformdf,"derived")),
+          cbind(PAQ="chaotic",prenticeTest(chaoticformdf,"derived"))) %>%
+  cbind(TEST="PT",.)
+
+pt %>% 
+        group_by(PAQ,CRITERION) %>%
+        mutate(pvalue=as.numeric(pvalue)) %>%
+        kbl(caption = "Prentice test p-value for annoying, vibrant, calm, monotonous, chaotic",
+            digits = 3, booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+```
+
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Prentice test p-value for annoying, vibrant, calm, monotonous, chaotic
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+TEST
+</th>
+<th style="text-align:left;">
+PAQ
+</th>
+<th style="text-align:left;">
+CRITERION
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.225
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.034
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.784
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.105
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+ANTO
+</td>
+<td style="text-align:right;">
+0.302
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+ORTH
+</td>
+<td style="text-align:right;">
+0.296
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+NCON
+</td>
+<td style="text-align:right;">
+0.872
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.251
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.054
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.897
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:right;">
+0.086
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.212
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.243
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.324
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.512
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:right;">
+0.026
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+monotonous
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.577
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+monotonous
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.979
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+monotonous
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.714
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+monotonous
+</td>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.057
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+monotonous
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:right;">
+0.424
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:right;">
+0.007
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:right;">
+0.153
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:right;">
+0.007
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+IBAL
+</td>
+<td style="text-align:right;">
+0.210
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PT
+</td>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:right;">
+0.011
+</td>
+</tr>
+</tbody>
+</table>
+
+``` r
+#MWW Rank Sum Test
+
+#identify which PAQ attribute and its respective criterion are < 5% significance level
+pt_sig <- pt %>%
+        filter(pvalue<0.05)
+pt_sig %>% select(c(PAQ,CRITERION)) %>%
+        kbl(caption = "PAQ attributes and criterions with p < 0,05",
+            booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+```
+
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+PAQ attributes and criterions with p &lt; 0,05
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+PAQ
+</th>
+<th style="text-align:left;">
+CRITERION
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+</tr>
+</tbody>
+</table>
+
+``` r
+#Annoying
+#unqiue criterion <5%
+annoyCrit<-pt_sig %>% filter(PAQ=="annoying") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+annoySIG<-annoyformdf %>% select(c(COUNTRY,annoyCrit, CANDIDATE,))
+
+#vibrant
+#unqiue criterion <5%
+vibrantCrit<-pt_sig %>% filter(PAQ=="vibrant") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+vibrantSIG<-vibrantformdf %>% select(c(COUNTRY,vibrantCrit, CANDIDATE,))
+
+#calm
+#unique criterion <5%
+calmCrit<-pt_sig %>% filter(PAQ=="calm") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+calmSIG<-calmformdf %>% select(c(COUNTRY,calmCrit, CANDIDATE,))
+
+#chaotic
+#unique criterion <5%
+chaoticCrit<-pt_sig %>% filter(PAQ=="chaotic") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+chaoticSIG<-chaoticformdf %>% select(c(COUNTRY,chaoticCrit, CANDIDATE,))
+
+#combine MWWT results for all PAQ attributes
+mwwtResults <- rbind(mwwTest(df=annoySIG, criterion=annoyCrit, PAQ="annoying"),
+                     mwwTest(df=vibrantSIG, criterion=vibrantCrit, PAQ="vibrant"),
+                     mwwTest(df=calmSIG, criterion=calmCrit, PAQ="calm"),
+                     mwwTest(df=chaoticSIG, criterion=chaoticCrit, PAQ="chaotic"))
+
+mwwtResults %>%
+        kbl(caption = "Mann-Whitney-Wilcoxon test results",
+            booktabs=T, digits = 3) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+```
+
+<table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Mann-Whitney-Wilcoxon test results
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+PAQ
+</th>
+<th style="text-align:left;">
+CRITERION
+</th>
+<th style="text-align:left;">
+CANDIDATE
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+<th style="text-align:right;">
+adjval
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:left;">
+membingitkan
+</td>
+<td style="text-align:right;">
+0.859
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+annoying
+</td>
+<td style="text-align:left;">
+UNDR
+</td>
+<td style="text-align:left;">
+menjengkelkan
+</td>
+<td style="text-align:right;">
+0.002
+</td>
+<td style="text-align:right;">
+0.003
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:left;">
+rancak
+</td>
+<td style="text-align:right;">
+0.314
+</td>
+<td style="text-align:right;">
+0.629
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+vibrant
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:left;">
+bersemarak
+</td>
+<td style="text-align:right;">
+0.054
+</td>
+<td style="text-align:right;">
+0.109
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:left;">
+tenang
+</td>
+<td style="text-align:right;">
+0.385
+</td>
+<td style="text-align:right;">
+0.771
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+calm
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:left;">
+menenangkan
+</td>
+<td style="text-align:right;">
+0.024
+</td>
+<td style="text-align:right;">
+0.048
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:left;">
+huru-hara
+</td>
+<td style="text-align:right;">
+0.192
+</td>
+<td style="text-align:right;">
+0.384
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+APPR
+</td>
+<td style="text-align:left;">
+kelam-kabut
+</td>
+<td style="text-align:right;">
+0.016
+</td>
+<td style="text-align:right;">
+0.032
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:left;">
+huru-hara
+</td>
+<td style="text-align:right;">
+0.003
+</td>
+<td style="text-align:right;">
+0.006
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CLAR
+</td>
+<td style="text-align:left;">
+kelam-kabut
+</td>
+<td style="text-align:right;">
+0.381
+</td>
+<td style="text-align:right;">
+0.762
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:left;">
+huru-hara
+</td>
+<td style="text-align:right;">
+0.022
+</td>
+<td style="text-align:right;">
+0.043
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chaotic
+</td>
+<td style="text-align:left;">
+CONN
+</td>
+<td style="text-align:left;">
+kelam-kabut
+</td>
+<td style="text-align:right;">
+0.202
+</td>
+<td style="text-align:right;">
+0.404
+</td>
+</tr>
+</tbody>
+</table>
+
+### Intra-country differences
+
+The Kruskal-Wallis test was employed to examine whether there are
+differences between translation candidates within each country (i.e. SG
+or MY).

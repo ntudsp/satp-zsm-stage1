@@ -9,7 +9,7 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
 library(pander)
 library(dataverse)
 library(dplyr)
@@ -17,6 +17,7 @@ library(stringr)
 library(kableExtra)
 library(tidyr)
 library(rstatix)
+library(muStat)
 
 source("helper.R")
 ```
@@ -305,7 +306,7 @@ summaryMean %>%
 
 ## Statistical analysis
 
-### Main axes: One translation candidate
+### One translation candidate
 
 Due to differences in sample size, Kruskal-Wallis test was adopted to examine the statistical differences between SG and MY populations for PAQ attributes with only a single translation candidate, i.e. *eventful*, *uneventful*, and *pleasant*.
 
@@ -326,6 +327,81 @@ kwtSolo %>%
 
 ```
 
-### Main axes: Mulitple translation candidate
+### Mulitple translation candidate
+
+With multiple translation candidates, the data takes the form of a replicated, unbalanced completed block design. The Prentice test (PT), a generalised form of the Friedman test was adopted to evaluate the differences between the candidates (blocks) as well as the influence of country of residence (groups).
+
+For differences detected at 5% significance level, a post-hoc Mann-Whitney-Wilcoxon rank sum test (MWWT) with Bonferroni correction was conducted for relevant pairs.
+
+```{r ptMain, message=FALSE}
+#generate p-values and effect size with prentice test
+pt<-rbind(cbind(PAQ="annoying",prenticeTest(annoyformdf,type="main")),
+          cbind(PAQ="vibrant",prenticeTest(vibrantformdf,"derived")),
+          cbind(PAQ="calm",prenticeTest(calmformdf,"derived")),
+          cbind(PAQ="monotonous",prenticeTest(monotformdf,"derived")),
+          cbind(PAQ="chaotic",prenticeTest(chaoticformdf,"derived"))) %>%
+  cbind(TEST="PT",.)
+
+pt %>% 
+        group_by(PAQ,CRITERION) %>%
+        mutate(pvalue=as.numeric(pvalue)) %>%
+        kbl(caption = "Prentice test p-value for annoying, vibrant, calm, monotonous, chaotic",
+            digits = 3, booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+#MWW Rank Sum Test
+
+#identify which PAQ attribute and its respective criterion are < 5% significance level
+pt_sig <- pt %>%
+        filter(pvalue<0.05)
+pt_sig %>% select(c(PAQ,CRITERION)) %>%
+        kbl(caption = "PAQ attributes and criterions with p < 0,05",
+            booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+#Annoying
+#unqiue criterion <5%
+annoyCrit<-pt_sig %>% filter(PAQ=="annoying") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+annoySIG<-annoyformdf %>% select(c(COUNTRY,annoyCrit, CANDIDATE,))
+
+#vibrant
+#unqiue criterion <5%
+vibrantCrit<-pt_sig %>% filter(PAQ=="vibrant") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+vibrantSIG<-vibrantformdf %>% select(c(COUNTRY,vibrantCrit, CANDIDATE,))
+
+#calm
+#unique criterion <5%
+calmCrit<-pt_sig %>% filter(PAQ=="calm") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+calmSIG<-calmformdf %>% select(c(COUNTRY,calmCrit, CANDIDATE,))
+
+#chaotic
+#unique criterion <5%
+chaoticCrit<-pt_sig %>% filter(PAQ=="chaotic") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+chaoticSIG<-chaoticformdf %>% select(c(COUNTRY,chaoticCrit, CANDIDATE,))
+
+#combine MWWT results for all PAQ attributes
+mwwtResults <- rbind(mwwTest(df=annoySIG, criterion=annoyCrit, PAQ="annoying"),
+                     mwwTest(df=vibrantSIG, criterion=vibrantCrit, PAQ="vibrant"),
+                     mwwTest(df=calmSIG, criterion=calmCrit, PAQ="calm"),
+                     mwwTest(df=chaoticSIG, criterion=chaoticCrit, PAQ="chaotic"))
+
+mwwtResults %>%
+        kbl(caption = "Mann-Whitney-Wilcoxon test results",
+            booktabs=T, digits = 3) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+```
+
+### Intra-country differences
+
+The Kruskal-Wallis test was employed to examine whether there are differences between translation candidates within each country (i.e. SG or MY).
 
 
