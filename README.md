@@ -4629,28 +4629,7 @@ monotCrit_MY<-intrakwtMY_sig %>% filter(PAQ=="monotonous") %>%
 
 monotSIG_MY<-monotformdf %>% select(c(COUNTRY,monotCrit_MY, CANDIDATE))
 
-monotformdfMY<-monotformdf %>% filter(COUNTRY=="MY")
-APPR.monot.MY.CIT<-cbind(data.frame(CRITERION="APPR",COUNTRY="MY",PAQ="monotonous"),
-        data.frame(conover.test(monotformdfMY$APPR,monotformdfMY$CANDIDATE,
-                                   kw=FALSE,method='bonferroni')))
-```
 
-    ## 
-    ##                            Comparison of x by group                            
-    ##                                  (Bonferroni)                                  
-    ## Col Mean-|
-    ## Row Mean |   kurang k   membosan
-    ## ---------+----------------------
-    ## membosan |   0.423870
-    ##          |     1.0000
-    ##          |
-    ## tidak be |   2.805865   2.381994
-    ##          |    0.0093*     0.0291
-    ## 
-    ## alpha = 0.05
-    ## Reject Ho if p <= alpha/2
-
-``` r
 #CIT for monotonous across SG and MY
 citResults<-rbind(ciTest(df=monotSIG_SG,
                          criterion = monotCrit_SG,

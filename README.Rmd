@@ -544,11 +544,6 @@ monotCrit_MY<-intrakwtMY_sig %>% filter(PAQ=="monotonous") %>%
 
 monotSIG_MY<-monotformdf %>% select(c(COUNTRY,monotCrit_MY, CANDIDATE))
 
-monotformdfMY<-monotformdf %>% filter(COUNTRY=="MY")
-APPR.monot.MY.CIT<-cbind(data.frame(CRITERION="APPR",COUNTRY="MY",PAQ="monotonous"),
-        data.frame(conover.test(monotformdfMY$APPR,monotformdfMY$CANDIDATE,
-                                   kw=FALSE,method='bonferroni')))
-
 
 #CIT for monotonous across SG and MY
 citResults<-rbind(ciTest(df=monotSIG_SG,
