@@ -1,5 +1,5 @@
 ---
-title: "README"
+title: "Replication code for \"Crossing the Linguistic Causeway: A Binational Approach for Translating Soundscape Attributes to Bahasa Melayu\""
 output: github_document
 always_allow_html: true
 
@@ -18,6 +18,9 @@ library(kableExtra)
 library(tidyr)
 library(rstatix)
 library(muStat)
+library(conover.test)
+library(fmsb)
+library(RColorBrewer)
 
 source("helper.R")
 ```
@@ -301,7 +304,65 @@ summaryMean %>%
             SG and MY populations") %>%
         kable_classic(full_width = F, html_font = "Cambria")
 
+#Plot mean scores in a radar chart
 
+mainAXisradardf <- rbind(
+  data.frame(rbind(rep(1,7),rep(0.4,7))) %>%
+    setNames(c("APPR","UNDR","CLAR","ANTO","ORTH","NCON","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  mainAxCOMBmean %>% select(APPR:IBAL) %>%
+    `rownames<-`(mainAxCOMBmean$CANDIDATE))
+
+derAXisradardf <- rbind(
+  data.frame(rbind(rep(1,5),rep(0.4,5))) %>%
+    setNames(c("APPR","UNDR","CLAR","CONN","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  derAxCOMBmean %>% filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% select(APPR:IBAL) %>% `rownames<-`(derAxCOMBmean %>% filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% .$CANDIDATE)) 
+
+#define color palette
+set2 <- RColorBrewer::brewer.pal(7, "Set2")
+
+#Main Axis
+op1 <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(mainAXisradardf, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "bottomright", 
+  legend = paste(c("eventful |","pleasant |","uneventful |",
+                    "annoying |","annoying |"),
+                  row.names(mainAXisradardf)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+par(op1)
+
+#Derived Axis
+op2 <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(derAXisradardf, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "topright", 
+  legend = paste(c("vibrant |","calm |","monotonous |",
+                    "chaotic |"),
+                  row.names(derAXisradardf)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+par(op2)
 ```
 
 ## Statistical analysis
@@ -312,9 +373,9 @@ Due to differences in sample size, Kruskal-Wallis test was adopted to examine th
 
 ```{r kwtsolo, message=FALSE}
 #KWT for solo translation candidates
-kwtSolo<-rbind(kwTest(eventformdf,type = "main") %>% mutate(PAQ="eventful"),
-               kwTest(uneventformdf,type = "main") %>% mutate(PAQ="uneventful"),
-               kwTest(pleasformdf,type = "main") %>% mutate(PAQ="pleasant"))
+kwtSolo<-rbind(kwTest(eventformdf,type = "main", ivar = "COUNTRY") %>% mutate(PAQ="eventful"),
+               kwTest(uneventformdf,type = "main", ivar = "COUNTRY") %>% mutate(PAQ="uneventful"),
+               kwTest(pleasformdf,type = "main", ivar = "COUNTRY") %>% mutate(PAQ="pleasant"))
 
 #Display KWT results
 kwtSolo %>%
@@ -366,19 +427,19 @@ annoyCrit<-pt_sig %>% filter(PAQ=="annoying") %>%
 
 annoySIG<-annoyformdf %>% select(c(COUNTRY,annoyCrit, CANDIDATE,))
 
-#vibrant
-#unqiue criterion <5%
-vibrantCrit<-pt_sig %>% filter(PAQ=="vibrant") %>% 
-               select(CRITERION) %>% unique(.) %>% .$CRITERION
-
-vibrantSIG<-vibrantformdf %>% select(c(COUNTRY,vibrantCrit, CANDIDATE,))
-
 #calm
 #unique criterion <5%
 calmCrit<-pt_sig %>% filter(PAQ=="calm") %>% 
                select(CRITERION) %>% unique(.) %>% .$CRITERION
 
 calmSIG<-calmformdf %>% select(c(COUNTRY,calmCrit, CANDIDATE,))
+
+#monotonous
+#unique criterion <5%
+monotCrit<-pt_sig %>% filter(PAQ=="monotonous") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+monotSIG<-monotformdf %>% select(c(COUNTRY,monotCrit, CANDIDATE,))
 
 #chaotic
 #unique criterion <5%
@@ -389,8 +450,8 @@ chaoticSIG<-chaoticformdf %>% select(c(COUNTRY,chaoticCrit, CANDIDATE,))
 
 #combine MWWT results for all PAQ attributes
 mwwtResults <- rbind(mwwTest(df=annoySIG, criterion=annoyCrit, PAQ="annoying"),
-                     mwwTest(df=vibrantSIG, criterion=vibrantCrit, PAQ="vibrant"),
                      mwwTest(df=calmSIG, criterion=calmCrit, PAQ="calm"),
+                     mwwTest(df=monotSIG, criterion=monotCrit, PAQ="monotonous"),
                      mwwTest(df=chaoticSIG, criterion=chaoticCrit, PAQ="chaotic"))
 
 mwwtResults %>%
@@ -404,4 +465,105 @@ mwwtResults %>%
 
 The Kruskal-Wallis test was employed to examine whether there are differences between translation candidates within each country (i.e. SG or MY).
 
+A pairwise posthoc Conover-Iman test was conducted when significant differences were found at 5% significance levels.
+
+```{r intrakwt, message=FALSE}
+
+#SG
+intrakwt_SG <- rbind(annoyformdf %>% filter(COUNTRY=="SG") %>% 
+        kwTest(df = .,type = "main",ivar = "CANDIDATE") %>%
+        mutate(PAQ="annoying"),
+        vibrantformdf %>% filter(COUNTRY=="SG") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="vibrant"),
+        calmformdf %>% filter(COUNTRY=="SG") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="calm"),
+        monotformdf %>% filter(COUNTRY=="SG") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="monotonous"),
+        chaoticformdf %>% filter(COUNTRY=="SG") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="chaotic")) %>% mutate(COUNTRY="SG")
+
+intrakwt_SG %>%
+        mutate(pvalue=as.numeric(pvalue),effect=as.numeric(effect)) %>%
+        kbl(caption = "Intra-country Kruskal-Wallis Test in SG",
+            booktabs=T, digits = 3) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+#MY
+intrakwt_MY <- rbind(annoyformdf %>% filter(COUNTRY=="MY") %>% 
+        kwTest(df = .,type = "main",ivar = "CANDIDATE") %>%
+        mutate(PAQ="annoying"),
+        vibrantformdf %>% filter(COUNTRY=="MY") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="vibrant"),
+        calmformdf %>% filter(COUNTRY=="MY") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="calm"),
+        monotformdf %>% filter(COUNTRY=="MY") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="monotonous"),
+        chaoticformdf %>% filter(COUNTRY=="MY") %>% 
+        kwTest(df = .,type = "derived",ivar = "CANDIDATE") %>%
+        mutate(PAQ="chaotic")) %>% mutate(COUNTRY="MY")
+
+intrakwt_MY %>%
+        mutate(pvalue=as.numeric(pvalue),effect=as.numeric(effect)) %>%
+        kbl(caption = "Intra-country Kruskal-Wallis Test in MY",
+            booktabs=T, digits = 3) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+#CIT
+
+#identify which PAQ attribute and its respective criterion are < 5% significance level
+intrakwtSG_sig <- intrakwt_SG %>%
+        filter(pvalue<0.05)
+intrakwtSG_sig %>% select(c(PAQ,CRITERION)) %>%
+        kbl(caption = "PAQ attributes and criterions in SG with p < 0,05",
+            booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+intrakwtMY_sig <- intrakwt_MY %>%
+        filter(pvalue<0.05)
+intrakwtMY_sig %>% select(c(PAQ,CRITERION)) %>%
+        kbl(caption = "PAQ attributes and criterions in SG with p < 0,05",
+            booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+#monotonous
+#unique criterion <5%
+monotCrit_SG<-intrakwtSG_sig %>% filter(PAQ=="monotonous") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+monotSIG_SG<-monotformdf %>% select(c(COUNTRY,monotCrit_SG, CANDIDATE))
+
+monotCrit_MY<-intrakwtMY_sig %>% filter(PAQ=="monotonous") %>% 
+               select(CRITERION) %>% unique(.) %>% .$CRITERION
+
+monotSIG_MY<-monotformdf %>% select(c(COUNTRY,monotCrit_MY, CANDIDATE))
+
+monotformdfMY<-monotformdf %>% filter(COUNTRY=="MY")
+APPR.monot.MY.CIT<-cbind(data.frame(CRITERION="APPR",COUNTRY="MY",PAQ="monotonous"),
+        data.frame(conover.test(monotformdfMY$APPR,monotformdfMY$CANDIDATE,
+                                   kw=FALSE,method='bonferroni')))
+
+
+#CIT for monotonous across SG and MY
+citResults<-rbind(ciTest(df=monotSIG_SG,
+                         criterion = monotCrit_SG,
+                         PAQ="monotonous") %>% mutate(COUNTRY="SG"),
+                  ciTest(df=monotSIG_MY,
+                         criterion = monotCrit_MY,
+                         PAQ="monotonous") %>% mutate(COUNTRY="MY"))
+
+#Plot CIT results
+citResults %>%
+        mutate(pvalue=as.numeric(pvalue),adjval=as.numeric(adjval)) %>%
+        kbl(caption = "Conover-Iman test results",
+            booktabs=T, digits = 4) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+```
 

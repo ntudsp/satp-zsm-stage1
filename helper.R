@@ -60,7 +60,10 @@ derAxSummarySPLIT <- function(x) {
 }
 
 #Kruskal Wallis Test
-kwTest<-function(df,type){
+kwTest<-function(df,type,ivar){
+        #df is the data
+        #type is either "main" or "derived" to describe the attributes' axes
+        #ivar is the independent variable
         mainCrit<-c("APPR","UNDR","CLAR","IBAL","ANTO","ORTH","NCON")
         derCrit<-c("APPR","UNDR","CLAR","IBAL","CONN")
         
@@ -68,15 +71,15 @@ kwTest<-function(df,type){
         
         if(type=="main"){
                 for(crit in mainCrit){
-                        kwt<-kruskal.test(x=df[,crit],g=as.factor(df$COUNTRY),data=df)
-                        kwteff<-kruskal_effsize(formula = as.formula(paste(crit,"~COUNTRY"))
+                        kwt<-kruskal.test(x=df[,crit],g=as.factor(df[,ivar]),data=df)
+                        kwteff<-kruskal_effsize(formula = as.formula(paste(crit,"~",ivar))
                                                 ,data=df)
                         data<-rbind(data,c(CRITERION=crit,pvalue=kwt$p.value,effect=kwteff$effsize))
                 }}
         if(type=="derived"){
                 for(crit in derCrit){
-                        kwt<-kruskal.test(x=df[,crit],g=as.factor(df$COUNTRY),data=df)
-                        kwteff<-kruskal_effsize(formula = as.formula(paste(crit,"~COUNTRY"))
+                        kwt<-kruskal.test(x=df[,crit],g=as.factor(df[,ivar]),data=df)
+                        kwteff<-kruskal_effsize(formula = as.formula(paste(crit,"~",ivar))
                                                 ,data=df)
                         data<-rbind(data,c(CRITERION=crit,pvalue=kwt$p.value,effect=kwteff$effsize))
                 }}
@@ -133,4 +136,47 @@ mwwTest <- function(df,criterion,PAQ){
                 }
         }
         return(wt %>% setNames(c("PAQ","CRITERION","CANDIDATE","pvalue","adjval")))
+}
+
+#Conover-Iman Test
+ciTest<-function(df,criterion,PAQ){
+        #df is the data
+        #criterion is a vector of criterion for which MWWT is conducted
+        #PAQ attribute under test
+        
+        #initialise dataframe
+        cit<-data.frame(PAQ=character(),
+                        CRITERION=character(),
+                        CANDIDATE=character(),
+                        pvalue=numeric(),
+                        adjpval=numeric())
+        
+        for (c in criterion){
+                print(c)
+                data<-df
+                cit_crit<-conover.test(data[,c],data$CANDIDATE,
+                                       kw=FALSE,method='bonferroni',)
+                cit<-rbind(cit,cbind(data.frame(PAQ=PAQ,CRITERION=c),
+                                     as.data.frame(cit_crit) %>% 
+                                             select(c(comparisons,P,P.adjusted))))
+        }
+        return(cit %>% setNames(c("PAQ","CRITERION","comparisons","pvalue","adjval")))
+}
+
+#function to create a radar chart
+create_beautiful_radarchart <- function(data, color = "#00AFBB", 
+                                        vlabels = colnames(data), vlcex = 0.7,
+                                        caxislabels = NULL, title = NULL, plty=1, ...){
+        radarchart(
+                data, axistype = 1,
+                # Customize the polygon
+                pcol = color, pfcol = scales::alpha(color, 0.2), plwd = 2, plty = plty,
+                # Customize the grid
+                cglcol = "grey", cglty = 1, cglwd = 0.8,
+                # Customize the axis
+                axislabcol = "grey", 
+                # Variable labels
+                vlcex = vlcex, vlabels = vlabels,
+                caxislabels = caxislabels, title = title, ...
+        )
 }
