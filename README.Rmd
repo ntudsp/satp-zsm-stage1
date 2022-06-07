@@ -1,0 +1,331 @@
+---
+title: "README"
+output: github_document
+always_allow_html: true
+
+#Bhan, Lam (2022) [Nanyang Technological University]
+#ORCID: 0000-0001-5193-6560
+#GitHub: https://github.com/bhanlam/
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pander)
+library(dataverse)
+library(dplyr)
+library(stringr)
+library(kableExtra)
+library(tidyr)
+library(rstatix)
+
+source("helper.R")
+```
+
+This repository contains the code accompanying the publication "Crossing the Linguistic Causeway: A Binational Approach for Translating Soundscape Attributes to Bahasa Melayu". This paper is hosted on [arXiv]() and the raw dataset is hosted at [10.21979/N9/0NE37R](https://doi.org/10.21979/N9/0NE37R).
+
+## Environment
+
+The code has been tested on the following platform.
+
+```{r session, message=FALSE, echo=FALSE}
+pander(sessionInfo())
+```
+
+## Data preparation
+
+The raw data file is retrieved and cleaned.
+
+### Dataloader
+The raw dataset is retrieved from the DR-NTU (Data) [https://researchdata.ntu.edu.sg] Dataverse repository at [10.21979/N9/0NE37R](https://doi.org/10.21979/N9/0NE37R) and processed.
+
+```{r dataloader, message=FALSE}
+#Set dataverse server
+Sys.setenv("DATAVERSE_SERVER" = "https://researchdata.ntu.edu.sg")
+#Retrieve raw data in csv
+dataset <- get_dataframe_by_name(
+  filename = "SATPQn.csv", 
+  dataset = "doi:10.21979/N9/0NE37R",
+  original = TRUE,
+  .f = read.csv)
+```
+### Data cleaning
+
+The raw data headers are first converted to ASCII to remove UTF-8 formatting. The survey responses are subsetted to remove participant data with "country of residence" that is neither Singapore (SG) or Malaysia (MY). The resulting dataset consists of 63 participant responses after the removal of 3 participants. 
+
+This is followed by extraction of individual dataframes corresponding to the respective criteria categories for main and derived axis attributes, respectively. 
+
+```{r cleaning, message=FALSE}
+#convert column names to ASCII
+colnames(dataset)<-iconv(colnames(dataset),
+                        from = 'UTF-8', 
+                        to = 'ASCII//TRANSLIT') 
+
+#remove non-SG/MY respondents
+sgmydata <- dataset %>%
+        dplyr::rename(COUNTRY=Current.country.of.residence) %>%
+        mutate(COUNTRY=ifelse(COUNTRY=="Malaysia","MY", COUNTRY)) %>%
+        mutate(COUNTRY=ifelse(COUNTRY=="Singapore","SG", COUNTRY)) %>%
+        mutate(COUNTRY=ifelse(COUNTRY=="Europe","Others", COUNTRY)) %>%
+        mutate(COUNTRY=ifelse(COUNTRY=="Asia (excl. MY and SG)",
+                              "Others", COUNTRY)) %>%
+        filter(!str_detect(COUNTRY, "Others"))
+
+#define column names for main and derived axes
+mainColnames<-c('COUNTRY','APPR','UNDR','ANTO','BIAS',
+                'ASSOCCW','IMPCCW','ASSOCW','IMPCW','CANDIDATE')
+
+derivedColnames<-c('COUNTRY','APPR','UNDR','ASSOCCW',
+                   'IMPCCW','ASSOCW','IMPCW','CANDIDATE')
+
+#extract responses for each PAQ attribute and rename columns with criteria
+#main axes
+eventdf<-sgmydata %>% 
+        select(matches('that.meriah|is.meriah|COUNTRY')) %>%
+        mutate(candidate="meriah") %>% setNames(mainColnames)
+
+pleasdf<-sgmydata %>%
+        select(matches('menyenangkan|COUNTRY')) %>%
+        mutate(candidate="menyenangkan") %>% setNames(mainColnames)
+
+uneventdf<-sgmydata %>%
+        select(matches('tidak.meriah|COUNTRY')) %>%
+        mutate(candidate="tidak meriah") %>% setNames(mainColnames)
+
+annoydf<-rbind(sgmydata %>%
+                select(matches('membingitkan|COUNTRY')) %>%
+                mutate(candidate="membingitkan") %>% 
+                setNames(mainColnames),
+               sgmydata %>%
+                select(matches('menjengkelkan|COUNTRY')) %>%
+                mutate(candidate="menjengkelkan") %>% 
+                setNames(mainColnames))
+
+#dervied axes
+vibrantdf<-rbind(sgmydata %>% select(matches('rancak|COUNTRY')) %>%
+                         mutate(candidate="rancak") %>% 
+                         setNames(derivedColnames),
+                 sgmydata %>% select(matches('bersemarak|COUNTRY')) %>%
+                         mutate(candidate="bersemarak") %>% 
+                         setNames(derivedColnames))
+
+calmdf<-rbind(sgmydata %>% select(matches('tenang|COUNTRY')) %>%
+                         mutate(candidate="tenang") %>% 
+                         setNames(derivedColnames),
+                 sgmydata %>% select(matches('menenangkan|COUNTRY')) %>%
+                         mutate(candidate="menenangkan") %>% 
+                         setNames(derivedColnames))
+
+monotdf<-rbind(sgmydata %>% select(matches('that.membosankan|COUNTRY')) %>%
+                         mutate(candidate="membosankan") %>% 
+                         setNames(derivedColnames),
+                sgmydata %>% select(matches('tidak.berubah.oleh.itu.membosankan|COUNTRY')) %>%
+                         mutate(candidate="tidak berubah oleh itu membosankan") %>% 
+                         setNames(derivedColnames),
+               sgmydata %>% select(matches('kurang.kepelbagaian.oleh.itu.membosankan|COUNTRY')) %>%
+                         mutate(candidate="kurang kepelbagaian oleh itu membosankan") %>% 
+                         setNames(derivedColnames))
+
+chaoticdf<-rbind(sgmydata %>% select(matches('huru.hara|COUNTRY')) %>%
+                         mutate(candidate="huru-hara") %>% 
+                         setNames(derivedColnames),
+                 sgmydata %>% select(matches('kelam.kabut|COUNTRY')) %>%
+                         mutate(candidate="kelam-kabut") %>% 
+                         setNames(derivedColnames))
+```
+
+### Cleaning of demographic information
+
+```{r democlean, message=FALSE}
+#column names
+demoCol <- c("Prof.zsm","Prof.eng","COUNTRY","LoSOut","DISCIPLINE")
+
+sgmydata_demo <- sgmydata %>%
+        select(2:6) %>% setNames(demoCol) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Science*',DISCIPLINE, ignore.case=T),
+                                 "Sciences", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Physic*',DISCIPLINE, ignore.case=T),
+                                 "Sciences", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Math*',DISCIPLINE, ignore.case=T),
+                                 "Sciences", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*English*',DISCIPLINE, ignore.case=T),
+                                 "HASS", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Psychology*',DISCIPLINE, ignore.case=T),
+                                 "HASS", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Literature*',DISCIPLINE, ignore.case=T),
+                                 "HASS", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Sociology*',DISCIPLINE, ignore.case=T),
+                                 "HASS", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Media*',DISCIPLINE, ignore.case=T),
+                                 "HASS", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*geog*',DISCIPLINE, ignore.case=T),
+                                 "HASS", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Music*',DISCIPLINE, ignore.case=T),
+                                 "Audio-related", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Sound*',DISCIPLINE, ignore.case=T),
+                                 "Audio-related", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Audio*',DISCIPLINE, ignore.case=T),
+                                 "Audio-related", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*Acoustic*',DISCIPLINE, ignore.case=T),
+                                 "Audio-related", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*engineering*',DISCIPLINE, ignore.case=T),
+                                 "Engineering", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(grepl('*tech*',DISCIPLINE, ignore.case=T),
+                                 "Engineering", DISCIPLINE)) %>%
+        mutate(DISCIPLINE=ifelse(!grepl('Sciences|Engineering|HASS|Audio-related',
+                                       DISCIPLINE, ignore.case=F),
+                                 "Others", DISCIPLINE))
+
+```
+
+### Formulation of criteria scores
+
+Main Axes: APPR, UNDR, CLAR, ANTO, ORTH, NCON, IBAL
+Derived Axes: APPR, UNDR, CLAR, CONN, IBAL
+
+```{r formulation, message=FALSE}
+
+#compute formulation across df of attributes on main axes
+main.formulated<-list(eventdf,pleasdf,uneventdf,annoydf) %>%
+        lapply(mainForm)
+
+#compute formulation across df of attributes on derived axes                     
+der.formulated<-list(vibrantdf,calmdf,monotdf,chaoticdf) %>%
+        lapply(derForm)
+
+eventformdf<-main.formulated[[1]]
+pleasformdf<-main.formulated[[2]]
+uneventformdf<-main.formulated[[3]]
+annoyformdf<-main.formulated[[4]] %>%
+        mutate(SPLITCANDIDATE=paste(COUNTRY,CANDIDATE))
+vibrantformdf<-der.formulated[[1]] %>%
+        mutate(SPLITCANDIDATE=paste(COUNTRY,CANDIDATE))
+calmformdf<-der.formulated[[2]] %>%
+        mutate(SPLITCANDIDATE=paste(COUNTRY,CANDIDATE))
+monotformdf<-der.formulated[[3]] %>%
+        mutate(SPLITCANDIDATE=paste(COUNTRY,CANDIDATE))
+chaoticformdf<-der.formulated[[4]] %>%
+        mutate(SPLITCANDIDATE=paste(COUNTRY,CANDIDATE))
+
+```
+
+## Demographic
+
+The demographics of the 63 participants are summarised based on "length of stay outside SG/MY", "disiciplines", "malay language proficiency", and "english language proficiency".
+
+
+```{r demoplots, message=FALSE}
+#LoS
+sgmydata_demo %>%
+  group_by(LoSOut) %>%
+  summarise(Singapore=sum(COUNTRY=="SG"),Malaysia=sum(COUNTRY=="MY")) %>%       
+  kbl(caption = "Length of Stay Outside SG/MY") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+#Disicpline
+sgmydata_demo %>%
+  group_by(DISCIPLINE) %>%
+  summarise(Singapore=sum(COUNTRY=="SG"),Malaysia=sum(COUNTRY=="MY")) %>%       
+  kbl(caption = "Discipline") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+#Malay Language Proficiency
+sgmydata_demo %>%
+  group_by(Prof.zsm) %>%
+  summarise(Singapore=sum(COUNTRY=="SG"),Malaysia=sum(COUNTRY=="MY")) %>%       
+  kbl(caption = "Malay Language Proficiency") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+#English Language Proficiency
+sgmydata_demo %>%
+  group_by(Prof.zsm) %>%
+  summarise(Singapore=sum(COUNTRY=="SG"),Malaysia=sum(COUNTRY=="MY")) %>%       
+  kbl(caption = "English Language Proficiency") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+```
+
+## Exploratory analysis
+
+Compute criteria mean scores of all PAQ attributes across the combined, SG, and MY populations.
+
+```{r explore,message=FALSE}
+
+#Combined cases
+
+#main axes
+mainAxCOMBmean <- rbind(cbind(data.frame(PAQ="eventful"),mainAxSummary(eventformdf)),
+      cbind(data.frame(PAQ="pleasant"),mainAxSummary(pleasformdf)),
+      cbind(data.frame(PAQ="uneventful"),mainAxSummary(uneventformdf)),
+      cbind(data.frame(PAQ="annoying"),mainAxSummary(annoyformdf))) %>%
+        mutate(COUNTRY="Combined")
+
+#derived axes
+derAxCOMBmean <-rbind(cbind(data.frame(PAQ="vibrant"),derAxSummary(vibrantformdf)),
+      cbind(data.frame(PAQ="calm"),derAxSummary(calmformdf)),
+      cbind(data.frame(PAQ="monotonous"),derAxSummary(monotformdf)),
+      cbind(data.frame(PAQ="chaotic"),derAxSummary(chaoticformdf))) %>%
+        mutate(COUNTRY="Combined")
+
+#Split cases (SG/MY)
+#main axes
+mainAxSPLITmean <- rbind(cbind(data.frame(PAQ="eventful"),mainAxSummarySPLIT(eventformdf)),
+      cbind(data.frame(PAQ="pleasant"),mainAxSummarySPLIT(pleasformdf)),
+      cbind(data.frame(PAQ="uneventful"),mainAxSummarySPLIT(uneventformdf)),
+      cbind(data.frame(PAQ="annoying"),mainAxSummarySPLIT(annoyformdf)))
+
+#derived axes
+derAxSPLITmean <-rbind(cbind(data.frame(PAQ="vibrant"),derAxSummarySPLIT(vibrantformdf)),
+      cbind(data.frame(PAQ="calm"),derAxSummarySPLIT(calmformdf)),
+      cbind(data.frame(PAQ="monotonous"),derAxSummarySPLIT(monotformdf)),
+      cbind(data.frame(PAQ="chaotic"),derAxSummarySPLIT(chaoticformdf)))
+
+#pivot dataframe for visualisation
+summaryMean<-rbind(rbind(mainAxCOMBmean,mainAxSPLITmean) %>% 
+        pivot_longer(cols=!c(PAQ,CANDIDATE,COUNTRY),
+                                      names_to="CRITERIA",
+                                      values_to="mean"),
+        rbind(derAxCOMBmean,derAxSPLITmean) %>% 
+        pivot_longer(cols=!c(PAQ,CANDIDATE,COUNTRY),
+                                      names_to="CRITERIA",
+                                      values_to="mean")) %>%
+        group_by(PAQ,CRITERIA,CANDIDATE) %>%
+        summarise(Combined=mean[COUNTRY=="Combined"],
+                  SG=mean[COUNTRY=="SG"],
+                  MY=mean[COUNTRY=="MY"])
+
+#Plot table of mean scores
+summaryMean %>%
+        kbl(caption = "Mean evaluation scores for the 
+            PAQ attributes for all evaluation criteria across combined, 
+            SG and MY populations") %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+
+```
+
+## Statistical analysis
+
+### Main axes: One translation candidate
+
+Due to differences in sample size, Kruskal-Wallis test was adopted to examine the statistical differences between SG and MY populations for PAQ attributes with only a single translation candidate, i.e. *eventful*, *uneventful*, and *pleasant*.
+
+```{r kwtsolo, message=FALSE}
+#KWT for solo translation candidates
+kwtSolo<-rbind(kwTest(eventformdf,type = "main") %>% mutate(PAQ="eventful"),
+               kwTest(uneventformdf,type = "main") %>% mutate(PAQ="uneventful"),
+               kwTest(pleasformdf,type = "main") %>% mutate(PAQ="pleasant"))
+
+#Display KWT results
+kwtSolo %>%
+        group_by(PAQ,CRITERION) %>%
+        mutate(pvalue=as.numeric(pvalue),
+               effect=as.numeric(effect)) %>%
+        kbl(caption = "Kruskal-Wallis p-value and effect sizes for eventful, uneventful, and pleasant",
+            digits = 3, booktabs=T) %>%
+        kable_classic(full_width = F, html_font = "Cambria")
+
+```
+
+### Main axes: Mulitple translation candidate
+
+
