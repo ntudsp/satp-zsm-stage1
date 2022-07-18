@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Lam"
+  given-names: "Bhan"
+  orcid: "https://orcid.org/0000-0001-5193-6560"
+title: "Replication code for: Crossing the Linguistic Causeway: A Binational Approach for Translating Soundscape Attributes to Bahasa Melayu"
+version: 1.0.0
+doi: 10.48550/arXiv.2206.03104
+date-released: 2022-06-07
+url: "https://github.com/ntudsp/satp-zsm-stage1"
