@@ -17,33 +17,34 @@ The code has been tested on the following platform.
 **Platform:** aarch64-apple-darwin20 (64-bit)
 
 **locale:**
-en\_US.UTF-8\|\|en\_US.UTF-8\|\|en\_US.UTF-8\|\|C\|\|en\_US.UTF-8\|\|en\_US.UTF-8
+en_US.UTF-8\|\|en_US.UTF-8\|\|en_US.UTF-8\|\|C\|\|en_US.UTF-8\|\|en_US.UTF-8
 
 **attached base packages:** *stats*, *graphics*, *grDevices*, *utils*,
 *datasets*, *methods* and *base*
 
-**other attached packages:** *RColorBrewer(v.1.1-2)*, *fmsb(v.0.7.1)*,
+**other attached packages:** *RColorBrewer(v.1.1-3)*, *fmsb(v.0.7.1)*,
 *conover.test(v.1.1.5)*, *muStat(v.1.7.0)*, *rstatix(v.0.7.0)*,
-*tidyr(v.1.1.4)*, *kableExtra(v.1.3.4)*, *stringr(v.1.4.0)*,
-*dplyr(v.1.0.7)*, *dataverse(v.0.3.10)* and *pander(v.0.6.5)*
+*tidyr(v.1.2.0)*, *kableExtra(v.1.3.4)*, *stringr(v.1.4.0)*,
+*dplyr(v.1.0.9)*, *dataverse(v.0.3.10)* and *pander(v.0.6.5)*
 
-**loaded via a namespace (and not attached):** *tidyselect(v.1.1.1)*,
-*xfun(v.0.25)*, *purrr(v.0.3.4)*, *haven(v.2.4.3)*, *carData(v.3.0-4)*,
-*colorspace(v.2.0-2)*, *vctrs(v.0.3.8)*, *generics(v.0.1.1)*,
-*htmltools(v.0.5.1.1)*, *viridisLite(v.0.4.0)*, *yaml(v.2.2.1)*,
-*utf8(v.1.2.2)*, *rlang(v.0.4.12)*, *pillar(v.1.6.4)*,
-*foreign(v.0.8-81)*, *glue(v.1.4.2)*, *DBI(v.1.1.1)*, *readxl(v.1.3.1)*,
+**loaded via a namespace (and not attached):** *tidyselect(v.1.1.2)*,
+*xfun(v.0.31)*, *purrr(v.0.3.4)*, *haven(v.2.4.3)*, *carData(v.3.0-4)*,
+*colorspace(v.2.0-3)*, *vctrs(v.0.4.1)*, *generics(v.0.1.2)*,
+*htmltools(v.0.5.2)*, *viridisLite(v.0.4.0)*, *yaml(v.2.3.5)*,
+*utf8(v.1.2.2)*, *rlang(v.1.0.3)*, *pillar(v.1.7.0)*,
+*foreign(v.0.8-81)*, *glue(v.1.6.2)*, *DBI(v.1.1.1)*, *readxl(v.1.3.1)*,
 *lifecycle(v.1.0.1)*, *cellranger(v.1.1.0)*, *munsell(v.0.5.0)*,
-*rvest(v.1.0.1)*, *zip(v.2.2.0)*, *evaluate(v.0.14)*, *knitr(v.1.33)*,
-*rio(v.0.5.27)*, *forcats(v.0.5.1)*, *curl(v.4.3.2)*, *fansi(v.0.5.0)*,
-*broom(v.0.7.9)*, *Rcpp(v.1.0.7)*, *scales(v.1.1.1)*,
-*backports(v.1.2.1)*, *webshot(v.0.5.2)*, *abind(v.1.4-5)*,
-*systemfonts(v.1.0.2)*, *hms(v.1.1.0)*, *digest(v.0.6.28)*,
-*stringi(v.1.7.5)*, *openxlsx(v.4.2.4)*, *tools(v.4.1.1)*,
-*magrittr(v.2.0.1)*, *tibble(v.3.1.5)*, *crayon(v.1.4.2)*,
+*zip(v.2.2.0)*, *rvest(v.1.0.2)*, *evaluate(v.0.15)*,
+*forcats(v.0.5.1)*, *knitr(v.1.39)*, *rio(v.0.5.27)*,
+*fastmap(v.1.1.0)*, *curl(v.4.3.2)*, *fansi(v.1.0.3)*, *broom(v.0.7.9)*,
+*Rcpp(v.1.0.8.3)*, *scales(v.1.2.0)*, *backports(v.1.4.1)*,
+*webshot(v.0.5.3)*, *abind(v.1.4-5)*, *systemfonts(v.1.0.4)*,
+*hms(v.1.1.0)*, *digest(v.0.6.29)*, *openxlsx(v.4.2.4)*,
+*stringi(v.1.7.6)*, *cli(v.3.3.0)*, *tools(v.4.1.1)*,
+*magrittr(v.2.0.3)*, *tibble(v.3.1.7)*, *crayon(v.1.5.1)*,
 *car(v.3.0-11)*, *pkgconfig(v.2.0.3)*, *ellipsis(v.0.3.2)*,
-*data.table(v.1.14.2)*, *xml2(v.1.3.2)*, *assertthat(v.0.2.1)*,
-*rmarkdown(v.2.10)*, *svglite(v.2.0.0)*, *httr(v.1.4.2)*,
+*data.table(v.1.14.2)*, *xml2(v.1.3.3)*, *assertthat(v.0.2.1)*,
+*rmarkdown(v.2.14)*, *svglite(v.2.1.0)*, *httr(v.1.4.3)*,
 *rstudioapi(v.0.13)*, *R6(v.2.5.1)* and *compiler(v.4.1.1)*
 
 ## Data preparation
@@ -265,7 +266,7 @@ Malaysia
 <tbody>
 <tr>
 <td style="text-align:left;">
-&gt;10 years
+\>10 years
 </td>
 <td style="text-align:right;">
 1
@@ -2253,6 +2254,8 @@ rancak
 </tbody>
 </table>
 
+### Radar plots of mean scores (combined SG & MY)
+
 ``` r
 #Plot mean scores in a radar chart
 
@@ -2293,7 +2296,7 @@ legend(
   )
 ```
 
-![](README_files/figure-gfm/explore-1.png)<!-- -->
+![](README_files/figure-gfm/radplotcomb-1.png)<!-- -->
 
 ``` r
 par(op1)
@@ -2319,10 +2322,158 @@ legend(
   )
 ```
 
-![](README_files/figure-gfm/explore-2.png)<!-- -->
+![](README_files/figure-gfm/radplotcomb-2.png)<!-- -->
 
 ``` r
 par(op2)
+```
+
+### Radar plots of mean scores (by population)
+
+``` r
+#Plot mean scores in a radar chart
+
+mainAXisradardf.sg <- rbind(
+  data.frame(rbind(rep(1,7),rep(0.4,7))) %>%
+    setNames(c("APPR","UNDR","CLAR","ANTO","ORTH","NCON","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  mainAxSPLITmean %>% filter(COUNTRY=="SG") %>% select(APPR:IBAL) %>%
+    `rownames<-`(mainAxCOMBmean$CANDIDATE))
+
+mainAXisradardf.my <- rbind(
+  data.frame(rbind(rep(1,7),rep(0.4,7))) %>%
+    setNames(c("APPR","UNDR","CLAR","ANTO","ORTH","NCON","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  mainAxSPLITmean %>% filter(COUNTRY=="MY") %>% select(APPR:IBAL) %>%
+    `rownames<-`(mainAxCOMBmean$CANDIDATE))
+
+derAXisradardf.sg <- rbind(
+  data.frame(rbind(rep(1,5),rep(0.4,5))) %>%
+    setNames(c("APPR","UNDR","CLAR","CONN","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  derAxSPLITmean %>% filter(COUNTRY=="SG") %>% 
+          filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+          select(APPR:IBAL) %>% 
+          `rownames<-`(derAxCOMBmean %>% 
+                               filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+                               .$CANDIDATE)) 
+derAXisradardf.my <- rbind(
+  data.frame(rbind(rep(1,5),rep(0.4,5))) %>%
+    setNames(c("APPR","UNDR","CLAR","CONN","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  derAxSPLITmean %>% filter(COUNTRY=="MY") %>% 
+          filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+          select(APPR:IBAL) %>% 
+          `rownames<-`(derAxCOMBmean %>% 
+                               filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+                               .$CANDIDATE)) 
+
+#define color palette
+set2 <- RColorBrewer::brewer.pal(7, "Set2")
+
+#Main Axis
+op.main.sg <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(mainAXisradardf.sg, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "bottomright", 
+  legend = paste(c("eventful |","pleasant |","uneventful |",
+                    "annoying |","annoying |"),
+                  row.names(mainAXisradardf.sg)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+```
+
+![](README_files/figure-gfm/radplotSplit-1.png)<!-- -->
+
+``` r
+par(op.main.sg)
+
+#Derived Axis
+op.der.sg <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(derAXisradardf.sg, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "topright", 
+  legend = paste(c("vibrant |","calm |","monotonous |",
+                    "chaotic |"),
+                  row.names(derAXisradardf.sg)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+```
+
+![](README_files/figure-gfm/radplotSplit-2.png)<!-- -->
+
+``` r
+par(op.der.sg)
+
+#Main Axis
+op.main.my <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(mainAXisradardf.my, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "bottomright", 
+  legend = paste(c("eventful |","pleasant |","uneventful |",
+                    "annoying |","annoying |"),
+                  row.names(mainAXisradardf.my)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+```
+
+![](README_files/figure-gfm/radplotSplit-3.png)<!-- -->
+
+``` r
+par(op.main.my)
+
+#Derived Axis
+op.der.my <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(derAXisradardf.my, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "topright", 
+  legend = paste(c("vibrant |","calm |","monotonous |",
+                    "chaotic |"),
+                  row.names(derAXisradardf.my)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+```
+
+![](README_files/figure-gfm/radplotSplit-4.png)<!-- -->
+
+``` r
+par(op.der.my)
 ```
 
 ## Statistical analysis
@@ -3114,7 +3265,7 @@ pt_sig %>% select(c(PAQ,CRITERION)) %>%
 
 <table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
-PAQ attributes and criterions with p &lt; 0,05
+PAQ attributes and criterions with p \< 0,05
 </caption>
 <thead>
 <tr>
@@ -4461,7 +4612,7 @@ intrakwtSG_sig %>% select(c(PAQ,CRITERION)) %>%
 
 <table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
-PAQ attributes and criterions in SG with p &lt; 0,05
+PAQ attributes and criterions in SG with p \< 0,05
 </caption>
 <thead>
 <tr>
@@ -4536,7 +4687,7 @@ intrakwtMY_sig %>% select(c(PAQ,CRITERION)) %>%
 
 <table class=" lightable-classic" style="font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
-PAQ attributes and criterions in SG with p &lt; 0,05
+PAQ attributes and criterions in SG with p \< 0,05
 </caption>
 <thead>
 <tr>

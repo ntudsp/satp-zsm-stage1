@@ -303,6 +303,11 @@ summaryMean %>%
             PAQ attributes for all evaluation criteria across combined, 
             SG and MY populations") %>%
         kable_classic(full_width = F, html_font = "Cambria")
+```
+
+### Radar plots of mean scores (combined SG & MY)
+
+```{r radplotcomb, message=FALSE}
 
 #Plot mean scores in a radar chart
 
@@ -363,7 +368,138 @@ legend(
   text.col = "black", cex = .9, pt.cex = 1.5
   )
 par(op2)
+
 ```
+
+### Radar plots of mean scores (by population)
+
+```{r radplotSplit, message=FALSE}
+
+#Plot mean scores in a radar chart
+
+mainAXisradardf.sg <- rbind(
+  data.frame(rbind(rep(1,7),rep(0.4,7))) %>%
+    setNames(c("APPR","UNDR","CLAR","ANTO","ORTH","NCON","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  mainAxSPLITmean %>% filter(COUNTRY=="SG") %>% select(APPR:IBAL) %>%
+    `rownames<-`(mainAxCOMBmean$CANDIDATE))
+
+mainAXisradardf.my <- rbind(
+  data.frame(rbind(rep(1,7),rep(0.4,7))) %>%
+    setNames(c("APPR","UNDR","CLAR","ANTO","ORTH","NCON","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  mainAxSPLITmean %>% filter(COUNTRY=="MY") %>% select(APPR:IBAL) %>%
+    `rownames<-`(mainAxCOMBmean$CANDIDATE))
+
+derAXisradardf.sg <- rbind(
+  data.frame(rbind(rep(1,5),rep(0.4,5))) %>%
+    setNames(c("APPR","UNDR","CLAR","CONN","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  derAxSPLITmean %>% filter(COUNTRY=="SG") %>% 
+          filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+          select(APPR:IBAL) %>% 
+          `rownames<-`(derAxCOMBmean %>% 
+                               filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+                               .$CANDIDATE)) 
+derAXisradardf.my <- rbind(
+  data.frame(rbind(rep(1,5),rep(0.4,5))) %>%
+    setNames(c("APPR","UNDR","CLAR","CONN","IBAL")) %>%
+    `rownames<-`(c("Max","Min")),
+  derAxSPLITmean %>% filter(COUNTRY=="MY") %>% 
+          filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+          select(APPR:IBAL) %>% 
+          `rownames<-`(derAxCOMBmean %>% 
+                               filter(!grepl('kurang|bersemarak|berubah|kelam|menenangkan', CANDIDATE)) %>% 
+                               .$CANDIDATE)) 
+
+#define color palette
+set2 <- RColorBrewer::brewer.pal(7, "Set2")
+
+#Main Axis
+op.main.sg <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(mainAXisradardf.sg, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "bottomright", 
+  legend = paste(c("eventful |","pleasant |","uneventful |",
+                    "annoying |","annoying |"),
+                  row.names(mainAXisradardf.sg)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+par(op.main.sg)
+
+#Derived Axis
+op.der.sg <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(derAXisradardf.sg, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "topright", 
+  legend = paste(c("vibrant |","calm |","monotonous |",
+                    "chaotic |"),
+                  row.names(derAXisradardf.sg)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+par(op.der.sg)
+
+#Main Axis
+op.main.my <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(mainAXisradardf.my, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "bottomright", 
+  legend = paste(c("eventful |","pleasant |","uneventful |",
+                    "annoying |","annoying |"),
+                  row.names(mainAXisradardf.my)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+par(op.main.my)
+
+#Derived Axis
+op.der.my <- par(mar = c(0, 0, 0, 0))
+create_beautiful_radarchart(derAXisradardf.my, 
+                            #caxislabels = c(0, 0.25, 0.5, 0.75, 1),
+                            caxislabels = c(0.4, 0.55, 0.7, 0.85, 1),
+                            color = set2,
+                            vlcex = .9,calcex=.7,
+                            plty=c(1,2,3,4,5,6,7))
+
+# Add an horizontal legend
+legend(
+  x = "topright", 
+  legend = paste(c("vibrant |","calm |","monotonous |",
+                    "chaotic |"),
+                  row.names(derAXisradardf.my)[-c(2,1)]), 
+  horiz = FALSE,
+  bty = "n", pch = 20 , col = set2,
+  text.col = "black", cex = .9, pt.cex = 1.5
+  )
+par(op.der.my)
+```
+
 
 ## Statistical analysis
 
